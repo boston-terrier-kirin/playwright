@@ -1,0 +1,16 @@
+{
+  "name": "69_playwright-scraping",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node script.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.28.1",
+    "ts-node": "^10.9.1"
+  }
+}
