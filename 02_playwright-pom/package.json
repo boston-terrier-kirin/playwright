@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx playwright test --config=playwright.config.ts --project=Chromium --reporter=html",
+    "e2e": "npx playwright test --config=e2e.config.ts --project=Chromium --reporter=html",
+    "visual": "npx playwright test --config=visual.config.ts --project=Chromium --reporter=html",
     "report": "npx playwright show-report"
   },
   "keywords": [],

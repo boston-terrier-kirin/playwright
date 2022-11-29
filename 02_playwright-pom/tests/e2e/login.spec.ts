@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
-import { HomePage } from '../pom/HomePage';
-import { LoginPage } from '../pom/LoginPage';
-import { RegisterPage } from '../pom/RegisterPage';
-import { attachScreenshot } from '../helpers';
+import { HomePage } from '../../pom/HomePage';
+import { LoginPage } from '../../pom/LoginPage';
+import { RegisterPage } from '../../pom/RegisterPage';
+import { attachScreenshot } from '../../helpers';
 
 test.describe('Login', () => {
   let loginPage: LoginPage;
