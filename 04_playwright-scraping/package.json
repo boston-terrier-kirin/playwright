@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node script.ts"
+    "dev": "ts-node script.ts",
+    "api": "ts-node api.ts"
   },
   "keywords": [],
   "author": "",
