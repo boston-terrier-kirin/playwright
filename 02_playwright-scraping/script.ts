@@ -22,22 +22,47 @@ const BASE_URL = 'https://github.com/topics/playwright';
   await page.goto(BASE_URL);
   await page.screenshot({ path: 'topics.png' });
 
-  const repos = await page.$$eval('article.border', (cards) => {
-    return cards.map((card) => {
-      const [user, repo] = Array.from(card.querySelectorAll('h3 a'));
-      const formatText = (elem: any) => elem && elem.innerText.trim();
+  // $$eval
+  // https://playwright.dev/docs/api/class-page#page-eval-on-selector-all
+  // In most cases, locator.evaluateAll(pageFunction[, arg]), other Locator helper methods and web-first assertions do a better job.
+  const repos = await page.$$eval('article.border', (cards) =>
+    cards.map((card) => {
+      const [user, repo] = Array.from(
+        card.querySelectorAll<HTMLElement>('h3 a')
+      );
+
+      const formatText = (elem: HTMLElement) => elem && elem.innerText.trim();
 
       return {
         user: formatText(user),
         repo: formatText(repo),
         url: (repo as HTMLAnchorElement).href,
       };
-    });
-  });
+    })
+  );
 
-  console.log(repos);
   const logger = fs.createWriteStream('data.txt', { flags: 'w' });
   logger.write(JSON.stringify(repos, null, ' '));
+
+  // evaluateAll
+  // https://playwright.dev/docs/api/class-locator#locator-evaluate-all
+  const respoList = await page.locator('article.border').evaluateAll((cards) =>
+    cards.map((card) => {
+      const [user, repo] = Array.from(
+        card.querySelectorAll<HTMLElement>('h3 a')
+      );
+
+      const formatText = (elem: HTMLElement) => elem && elem.innerText.trim();
+
+      return {
+        user: formatText(user),
+        repo: formatText(repo),
+        url: (repo as HTMLAnchorElement).href,
+      };
+    })
+  );
+
+  console.log('★', respoList);
 
   await context.close();
   await browser.close();
