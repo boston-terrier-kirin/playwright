@@ -58,23 +58,19 @@ test.describe.parallel('API testing', () => {
     expect(res.status()).toBe(400);
   });
 
-  // TODO：同じtokenが返ってきている。
-  test.only('TokenをGET', async ({ request }) => {
-    const { accessToken, refreshToken } = await loginAuto(request, 'kohei');
+  test('Tokenを多重でGET', async ({ request }) => {
+    let promises: any = [];
+    for (let i = 0; i < 5; i++) {
+      promises.push(loginAuto(request));
+    }
 
-    console.log(accessToken);
-    console.log(refreshToken);
-  });
-
-  test.only('TokenをGET2', async ({ request }) => {
-    const { accessToken, refreshToken } = await loginAuto(request, 'kohei');
-
-    console.log(accessToken);
-    console.log(refreshToken);
+    await Promise.all(promises).then((results) => {
+      console.log(results);
+    });
   });
 
   test('POST new post', async ({ request }) => {
-    const { accessToken, refreshToken } = await loginAuto(request, 'kohei');
+    const { accessToken, refreshToken } = await loginAuto(request);
 
     const res = await request.post('http://localhost:8090/task_api/tasks/', {
       data: {
@@ -89,10 +85,12 @@ test.describe.parallel('API testing', () => {
 
     const data = await res.json();
     expect(data.id).toBeTruthy();
+
+    console.log(data);
   });
 
   test('GET all post', async ({ request }) => {
-    const { accessToken, refreshToken } = await loginAuto(request, 'kirin');
+    const { accessToken, refreshToken } = await loginAuto(request);
 
     const res = await request.get('http://localhost:8090/task_api/tasks/', {
       headers: {
@@ -100,29 +98,35 @@ test.describe.parallel('API testing', () => {
       },
     });
 
-    const allData = await res.json();
-    expect(allData.length).toBeGreaterThan(0);
+    const data = await res.json();
+    expect(data.length).toBeGreaterThan(0);
+
+    console.log(data);
   });
 });
 
-async function loginAuto(request, user) {
+async function loginAuto(request) {
   const res = await request.post('http://localhost:8090/task_api/login.php/', {
     data: {
-      username: user,
+      username: 'kohei',
       password: '11111',
     },
   });
 
-  // エラーが発生する場合は、res.text()で内容をGETできる。
-  // レポートにもstdoutとして登録される。
-  console.log(await res.text());
+  try {
+    const loginData = await res.json();
+    const accessToken = loginData.access_token;
+    const refreshToken = loginData.refresh_token;
 
-  const loginData = await res.json();
-  const accessToken = loginData.access_token;
-  const refreshToken = loginData.refresh_token;
-
-  return {
-    accessToken,
-    refreshToken,
-  };
+    return {
+      accessToken,
+      refreshToken,
+    };
+  } catch (e) {
+    // エラーが発生する場合は、res.text()で内容をGETできる。
+    // レポートにもstdoutとして登録される。
+    console.log(await res.text());
+    console.log(e);
+    throw e;
+  }
 }
