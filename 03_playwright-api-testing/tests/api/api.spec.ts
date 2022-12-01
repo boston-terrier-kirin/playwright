@@ -69,10 +69,10 @@ test.describe.parallel('API testing', () => {
     });
   });
 
-  test('POST new post', async ({ request }) => {
+  test('POST new post then get one', async ({ request }) => {
     const { accessToken, refreshToken } = await loginAuto(request);
 
-    const res = await request.post('http://localhost:8090/task_api/tasks/', {
+    const newPostRes = await request.post(`${baseUrl}/tasks/`, {
       data: {
         name: 'Today is cold',
         priority: 1,
@@ -83,16 +83,62 @@ test.describe.parallel('API testing', () => {
       },
     });
 
-    const data = await res.json();
-    expect(data.id).toBeTruthy();
+    const data = await newPostRes.json();
+    const postId = data.id;
+    expect(postId).toBeTruthy();
 
-    console.log(data);
+    const getOneRes = await request.get(`${baseUrl}/tasks/${postId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    console.log(await getOneRes.text());
+
+    const one = await getOneRes.json();
+    expect(one.id).toBe(parseInt(postId));
+    expect(one.name).toBe('Today is cold');
+  });
+
+  test('POST new post then update', async ({ request }) => {
+    const { accessToken, refreshToken } = await loginAuto(request);
+
+    const newPostRes = await request.post(`${baseUrl}/tasks/`, {
+      data: {
+        name: 'Today is cold#2',
+        priority: 1,
+        is_completed: 0,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const data = await newPostRes.json();
+    const postId = data.id;
+    expect(postId).toBeTruthy();
+
+    const updateRes = await request.patch(`${baseUrl}/tasks/${postId}`, {
+      data: {
+        name: 'Today is cold#3',
+        priority: 1,
+        is_completed: 0,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    console.log(await updateRes.text());
+
+    const updated = await updateRes.json();
+    expect(updated.rows_updated).toBe(1);
   });
 
   test('GET all post', async ({ request }) => {
     const { accessToken, refreshToken } = await loginAuto(request);
 
-    const res = await request.get('http://localhost:8090/task_api/tasks/', {
+    const res = await request.get(`${baseUrl}/tasks/`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -106,7 +152,7 @@ test.describe.parallel('API testing', () => {
 });
 
 async function loginAuto(request) {
-  const res = await request.post('http://localhost:8090/task_api/login.php/', {
+  const res = await request.post(`${baseUrl}/login.php/`, {
     data: {
       username: 'kohei',
       password: '11111',
