@@ -9,6 +9,7 @@ const config: PlaywrightTestConfig = {
     ignoreHTTPSErrors: true,
     screenshot: 'on',
     video: 'on',
+    trace: 'on',
     launchOptions: {
       slowMo: 500,
     },

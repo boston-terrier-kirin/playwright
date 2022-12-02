@@ -45,7 +45,14 @@ test.describe('Login success', () => {
     await loadLoginPage(page);
     await page.locator('#username').fill('kohei');
     await page.locator('#password').fill('11111');
-    await page.locator('button[name="login"]').click();
+
+    await Promise.all([
+      page.waitForNavigation(),
+      page.locator('button[name="login"]').click(),
+    ]);
+
+    // homeがxhrしているので、networkidleになるまで待つ
+    await page.waitForLoadState('networkidle');
 
     const table = page.locator('#task-table');
 
