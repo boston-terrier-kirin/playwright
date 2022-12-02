@@ -14,7 +14,7 @@ const { devices } = require('@playwright/test');
 const config = {
   testDir: './tests',
   /* Maximum time one test can run for. */
-  timeout: 15 * 1000,
+  timeout: 60 * 1000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -40,13 +40,15 @@ const config = {
     // baseURL: 'http://localhost:3000',
 
     headless: false,
+
+    // slowMoを使うと、networkidleの待ちが若干変わってしまう気がする。
     // launchOptions: {
     //   slowMo: 500,
     // },
     screenshot: 'on',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on',
+    // trace: 'on',
   },
 
   /* Configure projects for major browsers */

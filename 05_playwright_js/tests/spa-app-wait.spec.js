@@ -16,6 +16,9 @@ test('Login success', async ({ page }) => {
 
   // spaの場合はnetworkidleを待てばOK
   const cards = page.locator('.card-body h5 b');
+  const cnt = await cards.count();
+  expect(cnt).toBeGreaterThan(0);
+
   const allTitle = await cards.allInnerTexts();
   console.log(allTitle);
 
