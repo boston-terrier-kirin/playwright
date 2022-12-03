@@ -31,24 +31,41 @@ test('すべての商品をチェック', async ({ page }, testInfo) => {
   }
 });
 
-test.only('カートに追加', async ({ page }, testInfo) => {
+test('カートに追加', async ({ page }, testInfo) => {
   await loginAuto(page);
 
   const cards = page.locator('.card-body');
-  const cnt = await cards.count();
-  expect(cnt).toBeGreaterThan(0);
+  const cardCnt = await cards.count();
+  expect(cardCnt).toBeGreaterThan(0);
 
   const card = cards.nth(1);
-  const addToCartButton = card.locator('text=Add To Cart');
+  const addToCartButton = card.locator('button >> text=Add To Cart');
   await addToCartButton.click();
 
   // xhrが終わって、オーバーレイが消えるのを待つ
   await page.waitForLoadState('networkidle');
   await page.waitForSelector('.ngx-spinner-overlay', { state: 'hidden' });
 
-  const cartItem = page.locator('text=Cart >> label');
+  const cartButton = page.locator('[routerlink="/dashboard/cart"]');
+  const cartItem = cartButton.locator('label');
   const cartItemCount = await cartItem.innerText();
   expect(cartItemCount).toBe('1');
+
+  await cartButton.click();
+  await page.waitForLoadState('networkidle');
+
+  // xhrが終わって画面がロードされるのを待つ方法
+  // 方法1
+  await page.waitForSelector('.cartWrap');
+  // 方法2
+  // const cartSections = page.locator('.cartWrap');
+  // await cartSections.waitFor();
+  // 方法3
+  // await expect(cartSections).toBeVisible();
+
+  const checkoutButton = page.locator('button >> text=Checkout');
+  await checkoutButton.click();
+  await page.waitForLoadState('networkidle');
 
   await page.screenshot({ path: 'debug.png', fullPage: true });
 });
@@ -60,7 +77,7 @@ async function loginAuto(page) {
   const userPassword = page.locator('#userPassword');
   const loginButton = page.locator('#login');
 
-  await userEmail.fill('anshika@gmail.com');
+  await userEmail.fill('kohei.matsumoto.edu@gmail.com');
   await userPassword.fill('Iamking@000');
   await loginButton.click();
 
